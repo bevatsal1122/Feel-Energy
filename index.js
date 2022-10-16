@@ -30,27 +30,45 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
 const client = new Client({intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessageReactions]});
 
+let active = true;
+
 client.on('ready', () => {
-  console.log(`Logged in as ${client.user.tag}`);
+  console.log(`Logged In >> ${client.user.tag}`);
 });
 
 client.on('interactionCreate', async interaction => {
   if (!interaction.isChatInputCommand()) return;
+  if (!active) {
+    await interaction.reply(bold("`Bot is sleeping 😴`\nExecute `$active -on` to wake up the Bot!!"));
+    return;
+  }
   
   if (interaction.commandName === "lets") {
     await interaction.reply('@everyone');
   }
   else if (interaction.commandName === "whoami") {
-    await interaction.reply(`${bold(interaction.user.tag)}`);
+    await interaction.reply(bold(interaction.user.tag));
   }
   else if (interaction.commandName === "this") {
-    await interaction.reply(`${bold('#' + interaction.channel.name)}`);
+    await interaction.reply(bold('#' + interaction.channel.name));
   }
 });
 
 client.on('messageCreate', async message => {
   if (message.author.bot) return;
-  if (message.content.slice(0, 6) === "excite" || message.content.slice(0, 7) === "inspire") {
+  const mLength = message.content.length;
+  if (message.content.slice(0, 7) === "$active") {
+    if (message.content.includes("-on", 8) && mLength == 11) {
+      active = true;
+      message.reply(bold("`Bot woke 🥱`"));
+    }
+    else if (message.content.includes("-off", 8) && mLength == 12) {
+      active = false;
+      message.reply(bold("`Bot slept 😴`"));
+    }
+  }
+  if (!active) return;
+  if (message.content.slice(0, mLength) === "excite" || message.content.slice(0, mLength) === "inspire") {
     try {
       const response = await axios.get("https://www.affirmations.dev");
       const mReply = await message.reply(bold(response.data.affirmation));
@@ -61,7 +79,7 @@ client.on('messageCreate', async message => {
     }
   }
   else if (message.content.slice(0, 5) === "$all ") {
-    const rawAnnouncement =  message.content.slice(5, message.content.length);
+    const rawAnnouncement =  message.content.slice(5, mLength);
     let userTag = "";
     let finalAnnouncement = "";
     let title = "";
@@ -122,7 +140,7 @@ client.on('messageCreate', async message => {
     mReply.react('💯');
     mReply.react('✨');
   }
-  else if (message.content.slice(0, message.content.length) === "$all") {
+  else if (message.content.slice(0, mLength) === "$all") {
     await message.reply(bold("Void/Null Notices cannot be parsed!!"));
   }
 });

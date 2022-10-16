@@ -3,9 +3,9 @@
 
 import { REST, Routes, Client, GatewayIntentBits, roleMention, userMention, bold, italic, underscore } from 'discord.js';
 import axios from "axios";
-// import dotenv from "dotenv";
+import dotenv from "dotenv";
 import { keepActive } from "./server.js";
-// dotenv.config();
+dotenv.config();
 
 const commands = [
   {
@@ -113,25 +113,26 @@ client.on('messageCreate', async message => {
 
     finalAnnouncement += rawAnnouncement.slice(counter, rawAnnouncement.length);
     
-    finalAnnouncement = finalAnnouncement.replace("-pin", '').trim();
+    finalAnnouncement = bold(finalAnnouncement.replace("-pin", '').trim());
     userTag = userTag.trim();
     let rawDate = new Date();
     let currentOffset = rawDate.getTimezoneOffset();
     let ISTOffset = 330;
     let currentDate = new Date(rawDate.getTime() + (ISTOffset + currentOffset)*60000).toString();
-    let finalDate = currentDate.slice(0, currentDate.indexOf("GMT")-1).trim();
+    let finalDate = currentDate.slice(0, currentDate.indexOf("GMT")).trim() + " IST";
 
     let titlePosition = finalAnnouncement.indexOf("-title(");
     if (titlePosition >= 0) {
       let endTitlePosition = finalAnnouncement.indexOf(")", titlePosition+1);
-      title = finalAnnouncement.slice(titlePosition+7, endTitlePosition);
-      finalAnnouncement = finalAnnouncement.replace(`-title(${title})`, '');
+      let rawTitle = finalAnnouncement.slice(titlePosition+7, endTitlePosition);
+      title = "Title: " + rawTitle;
+      finalAnnouncement = finalAnnouncement.replace(`-title(${rawTitle})`, '');
     }
 
     let announcement = `\n${bold(italic("` Announcer `"))} \t \t ${bold(userMention(message.author.id).trim())}
     \n${bold(italic("` Announcement `"))}\t ${bold(finalAnnouncement)}
     \n${bold(italic("` Mentions `"))}  \t  \t ${bold(userTag)}
-    \n${bold(italic("` Timestamp `"))} \t \t ${underscore(bold(finalDate + " IST"))}
+    \n${bold(italic("` Timestamp `"))} \t \t ${underscore(finalDate)}
     `
 
     const starter = "```" + title.toUpperCase() +  " ```";

@@ -65,6 +65,23 @@
   ```
 
   <br><img src="./assets/slash_commands.png" alt="Image2" width="360">
+  
+  
+  ### Entering & Exiting Sleeping Mode
+
+  ```sh
+  $active -on
+  ```
+
+  ```sh
+  $active -off
+  ```
+
+  The Bot won't respond when its sleeping.
+
+  <br><img src="./assets/sleeping_on_off.png" alt="Image3" width="390">
+
+  #### Note: No other text excluding required command should be added.
 
 <br>
 

@@ -1,6 +1,10 @@
+// Code by bevatsal1122
+// Trust God, Your Code Will Work
+
 import { REST, Routes, Client, GatewayIntentBits, roleMention, userMention, bold, italic, underscore } from 'discord.js';
-import axios from 'axios';
-import dotenv from 'dotenv';
+import axios from "axios";
+import dotenv from "dotenv";
+import { keepActive } from "./server.js";
 dotenv.config();
 
 const commands = [
@@ -39,7 +43,7 @@ client.on('ready', () => {
 client.on('interactionCreate', async interaction => {
   if (!interaction.isChatInputCommand()) return;
   if (!active) {
-    await interaction.reply(bold("`Bot is sleeping 😴`\nExecute `$active -on` to wake up the Bot!!"));
+    await interaction.reply(bold("`Bot is sleeping  😴`\nExecute `$active -on` to wake up the Bot!!"));
     return;
   }
   
@@ -128,21 +132,26 @@ client.on('messageCreate', async message => {
     `
 
     const starter = "```" + title.toUpperCase() +  " ```";
-    const mReply = await message.reply({ content: `${bold(starter)}\n${bold(italic("`<< Start of Announcement >>`"))}\n\n@everyone\n${announcement}\n\n${bold(italic("`<< End of Announcement >>`"))}`, fetchReply: true });
-
-    if (rawAnnouncement.includes("-pin", 3)) {
-      if (message.member.roles.cache.some(r => ["boss", "manager", "owner", "admin", "leader", "captain", "head"].includes(r.name.toLowerCase()))) {
-        mReply.pin();
+    const currentChannel = await client.channels.fetch(message.channelId);
+    
+    await currentChannel.send(`${bold(starter)}\n${bold(italic("`<< Start of Announcement >>`"))}\n\n@everyone\n${announcement}\n\n${bold(italic("`<< End of Announcement >>`"))}`)
+    .then(async mReply => {
+      mReply.react('🚀');
+      mReply.react('💯');
+      mReply.react('✨');
+      if (rawAnnouncement.includes("-pin", 3)) {
+        if (message.member.roles.cache.some(r => ["boss", "manager", "owner", "admin", "leader", "captain", "head"].includes(r.name.toLowerCase()))) {
+          mReply.pin();
+        }
       }
-    }
+      message.delete();
+    });
 
-    mReply.react('🚀');
-    mReply.react('💯');
-    mReply.react('✨');
   }
   else if (message.content.slice(0, mLength) === "$all") {
-    await message.reply(bold("Void/Null Notices cannot be parsed!!"));
+    await message.reply(bold("`Void/Null Notices cannot be parsed 😐`"));
   }
 });
 
+keepActive();
 client.login(process.env.TOKEN);

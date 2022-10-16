@@ -18,7 +18,7 @@ const commands = [
   },
   {
     name: "this",
-    description: "Replies Interaction Channel Name",
+    description: "Replies Interaction Channel Name"
   }
 ];
 

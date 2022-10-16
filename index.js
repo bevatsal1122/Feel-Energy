@@ -113,7 +113,7 @@ client.on('messageCreate', async message => {
 
     finalAnnouncement += rawAnnouncement.slice(counter, rawAnnouncement.length);
     
-    finalAnnouncement = bold(finalAnnouncement.replace("-pin", '').trim());
+    finalAnnouncement = finalAnnouncement.replace("-pin", '').trim();
     userTag = userTag.trim();
     let rawDate = new Date();
     let currentOffset = rawDate.getTimezoneOffset();
@@ -129,16 +129,18 @@ client.on('messageCreate', async message => {
       finalAnnouncement = finalAnnouncement.replace(`-title(${rawTitle})`, '');
     }
 
+    if (finalAnnouncement.length) finalAnnouncement = bold(finalAnnouncement);
+    if (userTag.length) userTag = bold(userTag);
+    
     let announcement = `\n${bold(italic("` Announcer `"))} \t \t ${bold(userMention(message.author.id).trim())}
-    \n${bold(italic("` Announcement `"))}\t ${bold(finalAnnouncement)}
-    \n${bold(italic("` Mentions `"))}  \t  \t ${bold(userTag)}
-    \n${bold(italic("` Timestamp `"))} \t \t ${underscore(finalDate)}
+    \n${bold(italic("` Announcement `"))}\t ${finalAnnouncement}
+    \n${bold(italic("` Mentions `"))}  \t  \t ${userTag}
+    \n${bold(italic("` Timestamp `"))} \t \t ${bold(underscore(finalDate))}
     `
-
+  
     const starter = "```" + title.toUpperCase() +  " ```";
     const currentChannel = await client.channels.fetch(message.channelId);
-    
-    await currentChannel.send(`${bold(starter)}\n${bold(italic("`<< Start of Announcement >>`"))}\n\n@everyone\n${announcement}\n\n${bold(italic("`<< End of Announcement >>`"))}`)
+    await currentChannel.send(`${bold(starter)}\n${bold(italic("`<< Start of Announcement >>`"))}\n\n@everyone\n${announcement}\n\n${bold(italic("`<< End of Announcement >>`"))}\n** **`)
     .then(async mReply => {
       mReply.react('🚀');
       mReply.react('💯');
